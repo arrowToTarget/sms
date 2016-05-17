@@ -2,6 +2,7 @@ package com.lewis.cms.common.base;
 
 
 import com.lewis.cms.common.annotation.TspServiceInfo;
+import com.lewis.cms.register.ZkRegister;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -26,10 +28,13 @@ import java.util.Map;
 @Component
 public class TspServiceComponent {
 
+    @Resource
+    private ZkRegister zkRegister;
+
     private List<RequestParam> requestList = new LinkedList<RequestParam>();
 
     @PostConstruct
-    public void init() throws InterruptedException, UnknownHostException {
+    public void init() throws Exception {
         ApplicationContext ctx = null;
         while (ctx == null) {
             ctx = AppContext.getApplicationContext();
@@ -39,15 +44,16 @@ public class TspServiceComponent {
         Collection<Object> values = beansWithAnnotationMap.values();
         loadServiceConfigIntoRequestParamList(requestList, values);
         System.out.println(requestList);
-        InetAddress localHost = InetAddress.getLocalHost();
+        /*InetAddress localHost = InetAddress.getLocalHost();
         String hostAddress = localHost.getHostAddress()+":8081";
         System.out.println(hostAddress);
         if (CollectionUtils.isNotEmpty(requestList)) {
             for (RequestParam requestParam : requestList) {
                 requestParam.setRequestUrl(hostAddress+requestParam.getRequestUrl());
             }
-        }
+        }*/
         System.out.println(requestList);
+        zkRegister.registerService(requestList);
     }
 
     private void loadServiceConfigIntoRequestParamList(List<RequestParam> requestList, Collection<Object> values) {

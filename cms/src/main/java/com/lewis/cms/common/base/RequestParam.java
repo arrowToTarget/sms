@@ -5,7 +5,7 @@ package com.lewis.cms.common.base;
  */
 public class RequestParam {
 
-    private String sysCode = "CMS";
+    private String sysCode = "cms";
     private String name;
     private String requestUrl;
 
